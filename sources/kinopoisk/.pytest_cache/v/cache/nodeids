@@ -1,0 +1,5 @@
+[
+  "test_scraper.py::test_extract_info[Plan 9]",
+  "test_scraper.py::test_extract_info[The Falcon]",
+  "test_scraper.py::test_extract_info[Shaheen]"
+]
