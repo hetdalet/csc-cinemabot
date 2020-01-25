@@ -22,10 +22,12 @@ HELP = (
     '/help\nПоказать это сообщение.',
 )
 NONE = '-'
+try:
+    TOKEN = os.environ['TOKEN']
+except KeyError:
+    TOKEN = sys.argv[1]
 
-TOKEN_PATH = os.path.join(os.path.normpath(sys.path[0]),'token')
-with open(TOKEN_PATH, 'r', encoding='utf-8') as file:
-    bot = telebot.TeleBot(file.read())
+bot = telebot.TeleBot(TOKEN)
 
 
 @bot.message_handler(commands=['start', 'go'])
@@ -42,7 +44,6 @@ def start_handler(message):
 @bot.message_handler(content_types=['text'])
 def text_handler(message):
     text = message.text.lower()
-    raise Exception
     chat_id = message.chat.id
     search_string = text.strip('[]')
     results = fetch(search_string)
@@ -76,9 +77,4 @@ def fetch(search_string):
 
 
 if __name__ == '__main__':
-    try:
-        bot.polling()
-    except KeyboardInterrupt:
-        sys.exit()
-    except Exception:
-        pass
+    bot.polling()
