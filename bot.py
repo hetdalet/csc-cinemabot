@@ -35,6 +35,11 @@ def start_handler(message):
     bot.send_message(message.chat.id, 'Привет, что будем смотреть?')
 
 
+@bot.message_handler(commands=['/find'])
+def start_handler(message):
+    bot.send_message(message.chat.id, str(message))
+
+
 @bot.message_handler(commands=['help'])
 def start_handler(message):
     for msg in HELP:
