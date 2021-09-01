@@ -38,23 +38,25 @@ INFO_FIELDS = ('title',
                'rating')
 
 
-def fetch(search_srting: str) -> List[Dict]:
+def fetch(search_srting: str, test: bool=False) -> List[Dict]:
     """
     Retrive some film detais by it's title.
 
     :param search_srting: film title will be passed to external search engine.
-        If search_string == 'test' prepared test data will be used
-        instead of make actual request to external search engine.
+    :param test: If True prepared test data will be used instead of make actual
+        request to external search engine.
     :return: list of length 3 with dicts contains found films info
     """
     if not search_srting:
         return None
-    if search_srting == 'test':
+
+    if test:
         with open(TEST_DATA_PATH, 'r', encoding='utf-8') as src:
             data = src.read()
     else:
         resp = requests.get(REQUEST_URL, params={'kp_query': search_srting})
         data = resp.text
+
     soup = bs4.BeautifulSoup(data, 'html.parser')
     result = []
     for e in soup.select('div.element')[:SEARCH_LIMIT]:
