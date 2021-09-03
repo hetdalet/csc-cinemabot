@@ -2,7 +2,7 @@
 
 import bs4
 import pytest
-from . import scraper
+import app.sources.kinopoisk.scraper
 
 
 class Case:
@@ -97,55 +97,57 @@ MIN_INFO = """
     </div>
 """
 
-CASES = (
-    Case(
-        'Plan 9',
-        FULL_INFO,
-        {
-            'title': 'План 9 из открытого космоса',
-            'director': 'Эдвард Д. Вуд мл.',
-            'year': '1959',
-            'duration': '79',
-            'country': 'США',
-            'genre': 'ужасы, фантастика',
-            'starring': 'Грегори Уэлкотт, Мона МакКиннон',
-            'poster': 'https://st.kp.yandex.net/images/film_iphone/iphone360_32251.jpg',
-            'rating': '5.2'
-        }
+
+@pytest.mark.parametrize(
+    'test_case', 
+    (
+        Case(
+            'Plan 9',
+            FULL_INFO,
+            {
+                'title': 'План 9 из открытого космоса',
+                'director': 'Эдвард Д. Вуд мл.',
+                'year': '1959',
+                'duration': '79',
+                'country': 'США',
+                'genre': 'ужасы, фантастика',
+                'starring': 'Грегори Уэлкотт, Мона МакКиннон',
+                'poster': 'https://st.kp.yandex.net/images/film_iphone/iphone360_32251.jpg',
+                'rating': '5.2'
+            }
+        ),
+        Case(
+            'The Falcon',
+            PARTIAL_INFO,
+            {
+                'title': 'The Falcon',
+                'director': None,
+                'year': '1989',
+                'duration': None,
+                'country': 'Тайвань',
+                'genre': 'боевик',
+                'starring': 'Эдди Чан, Лью Хсюнг Чанг',
+                'poster': 'https://st.kp.yandex.net/images/film_iphone/iphone360_1330784.jpg',
+                'rating': None
+            }
+        ),
+        Case(
+            'Shaheen',
+            MIN_INFO,
+            {
+                'title': 'Shaheen (сериал)',
+                'director': None,
+                'year': '1980',
+                'duration': None,
+                'country': None,
+                'genre': None,
+                'starring': None,
+                'poster': 'https://st.kp.yandex.net/images/film_iphone/iphone360_1122168.jpg',
+                'rating': None
+            }
+        ),
     ),
-    Case(
-        'The Falcon',
-        PARTIAL_INFO,
-        {
-            'title': 'The Falcon',
-            'director': None,
-            'year': '1989',
-            'duration': None,
-            'country': 'Тайвань',
-            'genre': 'боевик',
-            'starring': 'Эдди Чан, Лью Хсюнг Чанг',
-            'poster': 'https://st.kp.yandex.net/images/film_iphone/iphone360_1330784.jpg',
-            'rating': None
-        }
-    ),
-    Case(
-        'Shaheen',
-        MIN_INFO,
-        {
-            'title': 'Shaheen (сериал)',
-            'director': None,
-            'year': '1980',
-            'duration': None,
-            'country': None,
-            'genre': None,
-            'starring': None,
-            'poster': 'https://st.kp.yandex.net/images/film_iphone/iphone360_1122168.jpg',
-            'rating': None
-        }
-    ),
+    ids=lambda c: str(c)
 )
-
-
-@pytest.mark.parametrize('test_case', CASES, ids=lambda c: str(c))
 def test_extract_info(test_case: Case):
-    assert scraper.extract_info(test_case.input) == test_case.expected
+    assert app.sources.kinopoisk.scraper.extract_info(test_case.input) == test_case.expected
