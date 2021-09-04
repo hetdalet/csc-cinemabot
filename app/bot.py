@@ -55,10 +55,9 @@ def help_handler(message):
 def text_handler(message):
     text = message.text.lower()
     chat_id = message.chat.id
-    test_mode = (text == '[test]')
 
     indicator_msg = bot.send_message(message.chat.id, INDICATOR[0])
-    future_results = fetch(text, test=test_mode)
+    future_results = fetch(text)
     edit_args = {'chat_id': chat_id,
                  'message_id': indicator_msg.message_id,
                  'parse_mode': PARSE_MODE}
