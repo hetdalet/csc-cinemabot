@@ -57,17 +57,6 @@ def setup_text_handler(monkeypatch):
         'text': search_string
     })
     indicator_msg_id = search_msg_id + 1
-    # indicator_msg = get_message_mock({
-    #     'chat_id': chat_id,
-    #     'message_id': 2,
-    #     'text': ''
-    # })
-    # monkeypatch.setattr(
-    #     app.bot.bot,
-    #     'send_message',
-    #     unittest.mock.Mock(return_value=indicator_msg)
-    # )
-    # monkeypatch.setattr(app.bot.bot, 'edit_message_text', unittest.mock.Mock())
     bot_mock = unittest.mock.Mock(wraps=BotMock(init_msg_id=indicator_msg_id))
     monkeypatch.setattr(app.bot, 'bot', bot_mock)
     monkeypatch.setattr(app.bot, '_send_results', unittest.mock.Mock())
@@ -106,7 +95,6 @@ def setup_text_handler_found(monkeypatch, setup_text_handler):
     )
     expected['send_results_call'] = unittest.mock.call(
         message.chat.id,
-        message.text,
         search_result
     )
     return message, expected

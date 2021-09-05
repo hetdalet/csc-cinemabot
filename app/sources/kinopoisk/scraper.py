@@ -4,14 +4,11 @@
 __all__ = ('fetch',)
 
 
-import collections
-import functools
 import os
 import random
 import re
 import sys
 import time
-import typing
 from typing import Dict, List, Union
 
 import bs4
@@ -21,21 +18,25 @@ import requests
 REQUEST_URL = 'https://www.kinopoisk.ru/index.php'
 POSTER = 'https://st.kp.yandex.net/images/film/{}.jpg'
 POSTER_BIG = 'https://st.kp.yandex.net/images/film_iphone/iphone360_{}.jpg'
-TEST_DATA_PATH = os.path.join(os.path.normpath(sys.path[0]),
-                              'test_data',
-                              'kinopoisk-plan9-search.html')
+TEST_DATA_PATH = os.path.join(
+    os.path.normpath(sys.path[0]),
+    'test_data',
+    'kinopoisk-plan9-search.html'
+)
 DURATION_RE = re.compile(r'.*,\s+([0-9]+)\s+\S*$')
 COUNTRY_GEN_RE = re.compile(r'(?P<country>\w+)|(?P<genre>\([\w,. ]+\))')
 SEARCH_LIMIT = 3
-INFO_FIELDS = ('title',
-               'director',
-               'year',
-               'duration',
-               'country',
-               'genre',
-               'starring',
-               'poster',
-               'rating')
+INFO_FIELDS = (
+    'title',
+    'director',
+    'year',
+    'duration',
+    'country',
+    'genre',
+    'starring',
+    'poster',
+    'rating'
+)
 
 
 def fetch(search_srting: str) -> List[Dict]:
@@ -146,9 +147,11 @@ def is_actor_ref(element: bs4.element.Tag) -> bool:
         from search result page
     :return: True if element is link to actor profile, False otherwise
     """
-    return (element.name == 'a' and
-            element.has_attr('href') and
-            element['href'].startswith('/name'))
+    return (
+        element.name == 'a' and
+        element.has_attr('href') and
+        element['href'].startswith('/name')
+    )
 
 
 def check_posters(info_list: List[Dict]) -> List[Dict]:

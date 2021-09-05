@@ -11,32 +11,39 @@ from sources import kinopoisk
 
 SOURCES = (kinopoisk,)
 PARSE_MODE = 'Markdown'
-REPORT = '\n'.join(('*{title}* ({year})',
-                    '*Режиссер*: {director}',
-                    '*Жанр*: {genre}',
-                    '*В ролях*: {starring}',
-                    '*Страна*: {country}',
-                    '*Идет*: {duration} мин',
-                    '*Рейтинг*: {rating}'))
-HI = ('Привет! Чтобы получить информацию о фильме отправь в сообщении '
-      'его название. Не обязательно помнить название точно, найдётся всё:)')
-HELP = '\n'.join(('Чтобы получить информацию о фильме или сериале, '
-                  'отпрвьте сообщение с его названием, или частью названия.\n',
-                  'Так же поддерживаются команды',
-                  '*/start* — Начать работу с ботом.',
-                  '*[test]* — Проверить работоспособность бота.',
-                  '*/help* — Показать этo сообщения.'))
+REPORT = '\n'.join((
+    '*{title}* ({year})',
+    '*Режиссер*: {director}',
+    '*Жанр*: {genre}',
+    '*В ролях*: {starring}',
+    '*Страна*: {country}',
+    '*Идет*: {duration} мин',
+    '*Рейтинг*: {rating}'
+))
+HI = (
+    'Привет! Чтобы получить информацию о фильме отправь в сообщении '
+    'его название. Не обязательно помнить название точно, найдётся всё:)'
+)
+HELP = '\n'.join((
+    'Чтобы получить информацию о фильме или сериале, '
+    'отпрвьте сообщение с его названием, или частью названия.\n',
+    'Так же поддерживаются команды',
+    '*/start* — Начать работу с ботом.',
+    '*[test]* — Проверить работоспособность бота.',
+    '*/help* — Показать этo сообщения.'
+))
 INDICATOR = ('Поиск', 'Поиск.', 'Поиск..', 'Поиск...')
 FOUND = 'Вот, что нашлось по запросу «*{}*»:'
 NOT_FOUND = 'К сожалению, ничего не нашлось:('
 PLACEHOLDER = '—'
 NONE = '[NONE]'
+
 try:
     TOKEN = os.environ['TOKEN']
 except KeyError:
     TOKEN = sys.argv[1]
-
 bot = telebot.TeleBot(TOKEN)
+
 send_message_pm = functools.partial(bot.send_message, parse_mode=PARSE_MODE)
 send_photo_pm = functools.partial(bot.send_photo, parse_mode=PARSE_MODE)
 
@@ -67,7 +74,7 @@ def text_handler(message):
 
     if result:
         upd_indicator_msg(text=FOUND.format(message.text))
-        _send_results(chat_id, message.text, result)
+        _send_results(chat_id, result)
     else:
         upd_indicator_msg(text=NOT_FOUND)
 
@@ -83,7 +90,7 @@ def _wait_result(future_result, upd_indicator, indicator):
     return future_result.wait()
 
 
-def _send_results(chat_id, search_string, film_info):
+def _send_results(chat_id, film_info):
     for inf in film_info:
         inf['year'] = inf['year'] or PLACEHOLDER
         has_poster = bool(inf['poster'])
