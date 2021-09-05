@@ -51,35 +51,45 @@ def help_handler(message):
     send_message_pm(message.chat.id, HELP)
 
 
+@bot.message_handler(commands=['edwood'])
+def edwood_handler(message):
+    message.text = '_test_query_'
+    text_handler(message)
+
+
 @bot.message_handler(content_types=['text'])
 def text_handler(message):
-    text = message.text.lower()
+    search_string = message.text.lower()
     chat_id = message.chat.id
 
-    indicator_msg = bot.send_message(message.chat.id, INDICATOR[0])
-    future_results = fetch(text)
-    edit_args = {'chat_id': chat_id,
-                 'message_id': indicator_msg.message_id,
-                 'parse_mode': PARSE_MODE}
-    ind_len = len(INDICATOR)
+    indicator_msg = bot.send_message(chat_id, INDICATOR[0])
+    upd_indicator_msg = functools.partial(
+        bot.edit_message_text,
+        chat_id=chat_id,
+        message_id=indicator_msg.message_id,
+        parse_mode=PARSE_MODE
+    )
+    result = _wait_result(fetch(search_string), upd_indicator_msg, INDICATOR)
+
+    if result:
+        upd_indicator_msg(text=FOUND.format(message.text))
+        _send_results(chat_id, message.text, result)
+    else:
+        upd_indicator_msg(text=NOT_FOUND)
+
+
+def _wait_result(future_result, upd_indicator, indicator):
+    ind_len = len(indicator)
     step = 1
-    while not future_results.done:
-        edit_args['text'] = INDICATOR[step % ind_len]
-        bot.edit_message_text(**edit_args)
+    while not future_result.done:
+        upd_indicator(text=indicator[step % ind_len])
         step += 1
         time.sleep(0.2)
 
-    results = future_results.wait()
-    if results:
-        edit_args['text'] = FOUND.format(message.text)
-        bot.edit_message_text(**edit_args)
-        send_results(chat_id, message.text, results)
-    else:
-        edit_args['text'] = NOT_FOUND
-        bot.edit_message_text(**edit_args)
+    return future_result.wait()
 
 
-def send_results(chat_id, search_string, film_info):
+def _send_results(chat_id, search_string, film_info):
     for inf in film_info:
         inf['year'] = inf['year'] or PLACEHOLDER
         has_poster = bool(inf['poster'])
