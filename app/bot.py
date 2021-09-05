@@ -51,12 +51,6 @@ def help_handler(message):
     send_message_pm(message.chat.id, HELP)
 
 
-@bot.message_handler(commands=['edwood'])
-def edwood_handler(message):
-    message.text = '_test_query_'
-    text_handler(message)
-
-
 @bot.message_handler(content_types=['text'])
 def text_handler(message):
     search_string = message.text.lower()

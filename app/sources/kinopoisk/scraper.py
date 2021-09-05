@@ -59,7 +59,7 @@ def _fetch(search_srting: str) -> str:
     if not search_srting:
         return None
 
-    if search_srting == '_test_query_':
+    if search_srting == '_edwood_':
         with open(TEST_DATA_PATH, 'r', encoding='utf-8') as src:
             return src.read()
 
