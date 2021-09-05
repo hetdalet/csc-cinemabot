@@ -51,9 +51,9 @@ def fetch(search_srting: str) -> List[Dict]:
     soup = bs4.BeautifulSoup(data, 'html.parser')
     result = []
     for e in soup.select('div.element')[:SEARCH_LIMIT]:
-        result.append(extract_info(e))
+        result.append(_extract_info(e))
 
-    return check_posters(result)
+    return _check_posters(result)
 
 
 def _fetch(search_srting: str) -> str:
@@ -68,7 +68,7 @@ def _fetch(search_srting: str) -> str:
     return resp.text
 
 
-def extract_info(element: bs4.element.Tag) -> Dict:
+def _extract_info(element: bs4.element.Tag) -> Dict:
     """
     Extracts film details from fetched webpage element.
 
@@ -83,15 +83,15 @@ def extract_info(element: bs4.element.Tag) -> Dict:
         'title': lambda e: e.select_one('p.name a').text,
         'director': lambda e: e.select_one('span.gray i.director a').text,
         'year': lambda e: e.select_one('p.name span.year').text,
-        'duration': get_duration,
-        'poster': get_poster,
+        'duration': _get_duration,
+        'poster': _get_poster,
         'rating': lambda e: e.select_one('div.rating').text
     }
     for field, getter in getters.items():
         try:
             info[field] = getter(element)
         except (AttributeError, KeyError) as exc:
-            log_error(element, exc)
+            _log_error(element, exc)
 
     spans = element.select('span.gray')
     country = None
@@ -99,7 +99,7 @@ def extract_info(element: bs4.element.Tag) -> Dict:
     try:
         children = spans[1].children
     except (IndexError, AttributeError, TypeError) as exc:
-        log_error(element, exc)
+        _log_error(element, exc)
     else:
         for tag in children:
             match = COUNTRY_GEN_RE.match(str(tag).strip())
@@ -114,9 +114,9 @@ def extract_info(element: bs4.element.Tag) -> Dict:
     try:
         span = spans[2]
     except IndexError as exc:
-        log_error(element, exc)
+        _log_error(element, exc)
     else:
-        actor_refs = span.find_all(is_actor_ref)
+        actor_refs = span.find_all(_is_actor_ref)
         starring = ', '.join(t.text for t in actor_refs)
 
     info.update({
@@ -127,19 +127,19 @@ def extract_info(element: bs4.element.Tag) -> Dict:
     return {k: v or None for k, v in info.items()}
 
 
-def get_duration(element: bs4.element.Tag) -> str:
+def _get_duration(element: bs4.element.Tag) -> str:
     orig_tilte = element.select_one('span.gray').text
     return DURATION_RE.search(orig_tilte.strip()).group(1)
 
 
-def get_poster(element: bs4.element.Tag) -> Union[str, None]:
+def _get_poster(element: bs4.element.Tag) -> Union[str, None]:
     film_id = element.select_one('p.name a').attrs['data-id']
     if film_id:
         return POSTER_BIG.format(film_id)
     return None
 
 
-def is_actor_ref(element: bs4.element.Tag) -> bool:
+def _is_actor_ref(element: bs4.element.Tag) -> bool:
     """
     Determines if element is link to actor profile.
 
@@ -154,7 +154,7 @@ def is_actor_ref(element: bs4.element.Tag) -> bool:
     )
 
 
-def check_posters(info_list: List[Dict]) -> List[Dict]:
+def _check_posters(info_list: List[Dict]) -> List[Dict]:
     """
     Rmoves not valid poster refs from fetched film details.
 
@@ -170,7 +170,7 @@ def check_posters(info_list: List[Dict]) -> List[Dict]:
     return info_list
 
 
-def log_error(*args):
+def _log_error(*args):
     """
     Logger dummy.
     """
